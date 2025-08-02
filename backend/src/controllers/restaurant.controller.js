@@ -11,7 +11,7 @@ export const addDish = async (req,res) => {
       return res.status(400).json({ message: "Please provide all fields" });
     }
 
-    const addItem = new MenuItem({restaurantId:req.user._id, name, description, category, price,image});
+    const addItem = new MenuItem({restaurantId:req.restaurant._id, name, description, category, price,image});
     
     await addItem.save();
     res.status(201).json({success: true, data: addItem});
@@ -26,7 +26,7 @@ export const addDish = async (req,res) => {
 export const displayMenu = async(req, res) =>{
   
   try {
-    const items =  await MenuItem.findOne({restaurantId: req.user._id});
+    const items =  await MenuItem.findOne({restaurantId: req.restaurant._id});
     if (!items) {
       return res.status(404).json({ message: "No menu items found " });
     }
@@ -44,9 +44,12 @@ export const modifyItem = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    const item = await MenuItem.findOneAndUpdate({_id: id, restaurantId: req.user._id},  { new: true } );
+    const item = await MenuItem.findOneAndUpdate({_id: id, restaurantId: req.restaurant._id},updates, { new: true } );
 
     if (!item) return res.status(404).json({ message: 'Item not  found' });
+
+
+
     res.status(200).json({ success: true, data: item });
   } catch (error) {
     console.log("Error in modifyItem", error.message)
@@ -57,9 +60,10 @@ export const modifyItem = async (req, res) => {
 export const deleteItem = async(req, res) =>{
 
   try {
+    const { id } = req.params;
     const deleteItem = await MenuItem.findOneAndDelete({
-      _id: req.params.id,
-      restaurantId: req.user.id,
+      _id: id,
+      restaurantId: req.restaurant.id,
     });
     if(!deleteItem) {
       return res.status(404).json({message: "Item not found"});
@@ -74,7 +78,7 @@ export const deleteItem = async(req, res) =>{
 export const getAllOrders = async(req, res) => {
 
   try{
-    const orders = await Order.find({restaurantId: req.user._id}).populate('userId','username').populate('items.menuItem', 'name price');
+    const orders = await Order.find({restaurantId: req.restaurant._id}).populate('userId','username').populate('items.menuItem', 'name price');
 
     if(!orders){
       return res.status(404).json({ message: "No orders found ." });
@@ -105,7 +109,7 @@ export const updateOrderStatus = async( req, res) => {
     }
     
     const order = await Order.findOneAndUpdate(
-      {_id: orderId, restaurantId: req.user.id},
+      {_id: orderId, restaurantId: req.restaurant.id},
       {status}, {new: true}
     );
 

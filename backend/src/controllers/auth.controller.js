@@ -1,13 +1,13 @@
 import User from "../models/auth.model.js";
+import Restaurants from "../models/restaurant.model.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/generateToken.js";
 
 export const signUp = async (req, res) => {
-  const { userName, restaurantName, restaurantAddress, email, password, role } =
-    req.body;
+  const { userName, email, password, role } = req.body;
 
   try {
-    if (!email || !password) {
+    if (!email || !password || !userName) {
       return res.status(400).json({ message: "All fileds are required" });
     }
 
@@ -15,16 +15,6 @@ export const signUp = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Password must be at least 6 character" });
-    }
-
-    if (role === "user" && !userName) {
-      return res.status(400).json({ message: "User name is required" });
-    }
-
-    if (role === "restaurant" && (!restaurantName || !restaurantAddress)) {
-      return res
-        .status(400)
-        .json({ message: "Restaurant name and address are required" });
     }
 
     const existingUser = await User.findOne({ email });
@@ -36,57 +26,24 @@ export const signUp = async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    let newUsers;
-    if (role === "user") {
-      newUsers = new User({
-        userName,
-        email,
-        password: hashedPassword,
-        role,
-      });
-    } else if (role === "restaurant") {
-      newUsers = new User({
-        restaurantName,
-        restaurantAddress,
-        email,
-        password: hashedPassword,
-        role,
-      });
-    } else if (role === "admin") {
-      newUsers = new User({
-        userName,
-        email,
-        password: hashedPassword,
-        role,
-      });
-    } else {
-      return res.status(400).json({ message: "Invalid role" });
-    }
+    const newUsers = new User({
+      userName,
+      email,
+      password:hashedPassword,
+      role
+    });
 
-    if (newUsers) {
-      generateToken(newUsers._id, user.role, res);
-      await newUsers.save();
+    await newUsers.save();
 
-      if (role === "user" || role === "admin") {
-        return res.status(201).json({
-          _id: newUsers._id,
-          userName: newUsers.userName,
-          email: newUsers.email,
-          role: newUsers.role,
-        });
-      } else if (role === "restaurant") {
-        return res.status(201).json({
-          _id: newUsers._id,
-          restaurantName: newUsers.restaurantName,
-          restaurantAddress: newUsers.restaurantAddress,
-          email: newUsers.email,
-          role: newUsers.role,
-        });
-      }
-    } else {
-      return res.status(400).json({ message: "Invalid user data" });
-    }
-  } catch (error) {
+    generateToken(newUsers._id, newUsers.role, res);
+    
+    return res.status(201).json({
+      _id: newUsers._id,
+      userName: newUsers.userName,
+      email: newUsers.email,
+      role: newUsers.role,
+    });
+  }catch (error) {
     console.log("Error in signup controller", error.message);
     return res.status(500).json({ message: "Incorrect input" });
   }
@@ -99,42 +56,40 @@ export const logIn = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ message: "All fileds are required" });
     }
-
+    
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: "No account found Create one" });
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(400).json({ message: "Invalid password" });
-    }
-
-    generateToken(user._id, user.role, res);
-
-    let response = {
-      _id: user._id,
-      role: user.role,
-      email: user.email,
-    };
-
-    if (user.role === "user" || user.name === "admin") {
-      res.status(200).json({
+    if (user) {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(400).json({ message: "Invalid password" });
+      }
+      generateToken(user._id, user.role, res);
+      
+      return res.status(200).json({
         _id: user._id,
         userName: user.userName,
         email: user.email,
         role: user.role,
       });
-    } else if (user.role === "restaurant") {
-      res.status(200).json({
-        _id: user._id,
-        restaurantName: user.restaurantName,
-        restaurantAddress: user.restaurantAddress,
-        email: user.email,
-        role: user.role,
+    }
+
+    const restaurant = await Restaurants.findOne({ email });
+    if(restaurant){
+      const isPasswordValid = await bcrypt.compare(password, restaurant.password);
+      if (!isPasswordValid) {
+        return res.status(400).json({ message: "Invalid password" });
+      }
+      generateToken(restaurant._id, restaurant.role, res);
+      return res.status(200).json({
+        _id: restaurant._id,
+        restaurantName: restaurant.restaurantName,
+        restaurantAddress: restaurant.restaurantAddress,
+        email: restaurant.email,
+        role: restaurant.role,
       });
     }
-  } catch (error) {
+    return res.status(400).json({ message: "No account found. Create one." });
+  }catch (error) {
     console.log("Error in login controller", error.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -152,3 +107,52 @@ export const logOut = async (req, res) => {
     res.status(500).json({message: "Internal server Error"});
   }
 };
+
+export const RestaurantSignUp = async (req, res) => {
+  const { restaurantName, restaurantAddress, email, password,role } = req.body;
+  if (!req.body) {
+    return res.status(400).json({ message: "Request body missing." });
+  }
+  try {
+    if (!restaurantName || !restaurantAddress || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 character" });
+    }
+
+    const existingRestaurant = await Restaurants.findOne({ email });
+
+    if (existingRestaurant) {
+      return res.status(400).json({ message: "Restaurant already exists" });
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const newRestaurant = new Restaurants({
+      restaurantName,
+      restaurantAddress,
+      email,
+      password: hashedPassword,
+      role
+    });
+
+    await newRestaurant.save();
+    
+    generateToken(newRestaurant._id, newRestaurant.role, res);
+    return res.status(201).json({
+      _id: newRestaurant._id,
+      restaurantName: newRestaurant.restaurantName,
+      restaurantAddress: newRestaurant.restaurantAddress,
+      email: newRestaurant.email,
+      role: newRestaurant.role,
+    });
+  } catch (error) {
+    console.log("Error in restaurant signup controller", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}

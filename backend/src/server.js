@@ -22,7 +22,7 @@ app.use("/api/restaurant", verifyToken, restaurantRouter);
 app.use("/api/user",verifyToken, userRouter);
 
 
- app.listen(PORT, async() => {
+app.listen(PORT, async() => {
   console.log(`Server is running on http://localhost:${PORT}`);
   await connectToDatabase();
- })
+})

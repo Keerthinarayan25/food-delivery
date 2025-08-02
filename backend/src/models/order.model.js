@@ -1,49 +1,44 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
+
+const orderItemSchema = new mongoose.Schema({
+  menuItem:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "MenuItem",
+    required: true
+  },
+  quantity:{
+    type: Number,
+    required: true,
+    min: 1
+  }
+});
 
 const orderSchema = new mongoose.Schema({
-
-  userId:{
+  user:{
     type: mongoose.Schema.Types.ObjectId,
-    ref:'User',
-    required:true,
+    ref: "User",
+    required: true
   },
-  restaurantId:{
-    type:mongoose.Types.ObjectId,
-    ref:'Restaurants',
-    required:true,
+  restaurant:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Restaurant",
+    required: true
   },
-  items:[{
-    menuItem:{
-      type:mongoose.Types.ObjectId,
-      ref:"MenuItem",
-      required:true
-    },
-    quantity:{
-      type:Number,
-      required:true,
-      min:1
-    }
-  }],
-  totalPrice: {
+  items:[orderItemSchema],
+  totalPrice:{
     type: Number,
     required: true
   },
-  status: {
+  status:{
     type: String,
-    enum: ['placed', 'accepted', 'preparing', 'out for delivery', 'delivered', 'cancelled'],
-    default: 'placed'
+    enum: ["placed", "preparing", "ready", "delivered", "cancelled"],
+    default: "placed"
   },
-  paymentStatus: {
-    type: String,
-    enum: ['pending', 'paid', 'failed'],
-    default: 'pending'
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
+  deliveryAddress:{
+    type: String
+  }, 
+}, { timestamps: true });
 
-},{timestamps:true});
 
 const Order = mongoose.model('Order',orderSchema);
 

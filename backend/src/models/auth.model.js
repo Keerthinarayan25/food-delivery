@@ -6,22 +6,7 @@ const userSchema = new mongoose.Schema({
     trim:true,
     minLength:4,
     maxLength:15,
-    required:function(){
-      return this.role ==="user" || this.role === "admin";
-    },
-  },
-  restaurantName:{
-    type:String,
-    minLength:4,
-    required: function () {
-      return this.role === "restaurant";
-    },
-  },
-  restaurantAddress:{
-    type:String,
-    required: function () {
-      return this.role === "restaurant";
-    },
+    required:true
   },
   email:{
     type:String,
@@ -36,8 +21,7 @@ const userSchema = new mongoose.Schema({
   },
   role:{
     type:String,
-    required:true,
-    enum:["admin","user","restaurant"]
+    enum:["user"],
   }
 },{timestamps:true});
 

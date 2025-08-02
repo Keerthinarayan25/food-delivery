@@ -7,16 +7,16 @@ const restaurantRouter = Router();
 
 restaurantRouter.get("/profile", authorizeRole("user","restaurant","admin"));
 
-restaurantRouter.get("/menu", authorizeRole("user","restaurant"), displayMenu);
+restaurantRouter.get("/menu", authorizeRole("user","restaurant"), displayMenu); //done
 restaurantRouter.get("/orders", authorizeRole("admin","restaurant"),getAllOrders);
 
 restaurantRouter.post("/profile", authorizeRole("restaurant"));
-restaurantRouter.post("/menu", authorizeRole("restaurant"),addDish);
+restaurantRouter.post("/add-dish", authorizeRole("restaurant"),addDish); //done
 
-restaurantRouter.put("/menu/:id", authorizeRole("restaurant"),modifyItem);
+restaurantRouter.put("/menu/:id", authorizeRole("restaurant"),modifyItem); //done
 
 restaurantRouter.patch("/order/:id",authorizeRole("restaurant"), updateOrderStatus);
 
-restaurantRouter.delete("/menu/:id",authorizeRole("restaurant"), deleteItem);
+restaurantRouter.delete("/menu/:id",authorizeRole("restaurant"), deleteItem); //done
 
 export default restaurantRouter;
