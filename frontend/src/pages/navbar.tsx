@@ -25,12 +25,6 @@ const Navbar: React.FC = () => {
                 {AuthUser.role === "user" && (
                   <>
                     <Link
-                      to="/user/home"
-                      className="text-gray-600 hover:text-gray-900 transition"
-                    >
-                      Home
-                    </Link>
-                    <Link
                       to="/user/orders"
                       className="text-gray-600 hover:text-gray-900 transition"
                     >

@@ -12,10 +12,16 @@ export const getAllRestaurants = async (req, res) => {
         .status(404)
         .json({ success: false, message: "No restaurants found" });
     }
+    const formattedRestaurants = restaurants.map(restaurant => ({
+      _id: restaurant._id, 
+      name: restaurant.restaurantName,
+      address: restaurant.restaurantAddress,
+      image: restaurant.image, 
+    }));
     res.status(200).json({
       success: true,
       message: "Restaurants fetched successfully",
-      data: restaurants,
+      data: formattedRestaurants,
     });
   } catch (error) {
     console.log('Error in getAllRestaurants:', error.message);

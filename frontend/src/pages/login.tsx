@@ -27,7 +27,7 @@ const Login = () => {
           </h1>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} method="post">
           <div className="pb-6">
             <label htmlFor="email" className="block text-sm pb-3">Email</label>
             <input

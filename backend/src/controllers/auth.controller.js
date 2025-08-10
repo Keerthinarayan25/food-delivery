@@ -70,6 +70,7 @@ export const logIn = async (req, res) => {
       return res.status(200).json({
         _id: user._id,
         userName: user.userName,
+        address: user.address,
         email: user.email,
         role: user.role,
       });

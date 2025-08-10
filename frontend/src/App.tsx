@@ -1,10 +1,11 @@
 import { useEffect } from 'react'
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import Navbar from "./pages/navbar"
 import { Loader } from 'lucide-react';
 import Login from './pages/login';
 import Signup from './pages/signup';
+import Homepage from './pages/HomePage';
 
 function App() {
   const {AuthUser, checkAuth, isCheckingAuth} = useAuthStore();
@@ -25,8 +26,9 @@ function App() {
       <BrowserRouter>
       <Navbar/>
       <Routes>
-        <Route path='/login' element={<Login/>}  />
-        <Route path='/signup' element={<Signup/>}  />
+        <Route path='/' element={AuthUser? <Homepage/>: <Navigate to= '/login' />}/>
+        <Route path = "/login" element = {!AuthUser?<Login/>: <Navigate to="/" />} />
+        <Route path = "/signup" element = {!AuthUser?<Signup/> : <Navigate to="/"/>}/>
       </Routes>
       </BrowserRouter>
     </div>

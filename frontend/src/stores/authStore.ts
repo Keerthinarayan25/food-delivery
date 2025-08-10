@@ -3,19 +3,32 @@ import api from '@/services/api';
 
 export type UserRole = 'user' | 'restaurant';
 
-interface AuthUser {
-  role: "user" | "restaurant";
-  token?: string;
+interface UserProfile {
+  _id: string;
+  userName: string;
+  address: string;
+  email: string;
+  role: 'user';
 }
+
+interface RestaurantProfile {
+  _id: string;
+  restaurantName: string;
+  restaurantAddress: string;
+  email: string;
+  role: 'restaurant';
+}
+
+type AuthUser = UserProfile | RestaurantProfile;
 interface LoginData {
   email: string;
   password: string;
 }
 interface SignupData {
-  name:string;
+  userName:string;
   address:string;
   email:string;
-  role: UserRole;
+  role:UserRole;
 }
 
 interface AuthState {
@@ -68,9 +81,19 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  logout: () => {
-    set({ AuthUser: null, isLogedIn: false });
-  }
 
+  logout: async () => {
+    try {
 
-}));
+      await api.post("/auth/logout");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+
+      set({ AuthUser: null, isLogedIn: false });
+    }
+  },
+
+}
+
+));
