@@ -4,10 +4,10 @@ import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/generateToken.js";
 
 export const signUp = async (req, res) => {
-  const { userName, email, password, role } = req.body;
+  const { userName, address, email, password, role } = req.body;
 
   try {
-    if (!email || !password || !userName) {
+    if (!email || !address|| !password || !userName) {
       return res.status(400).json({ message: "All fileds are required" });
     }
 
@@ -28,6 +28,7 @@ export const signUp = async (req, res) => {
 
     const newUsers = new User({
       userName,
+      address,
       email,
       password:hashedPassword,
       role
@@ -40,6 +41,7 @@ export const signUp = async (req, res) => {
     return res.status(201).json({
       _id: newUsers._id,
       userName: newUsers.userName,
+      address: newUsers.address,
       email: newUsers.email,
       role: newUsers.role,
     });
@@ -154,5 +156,14 @@ export const RestaurantSignUp = async (req, res) => {
   } catch (error) {
     console.log("Error in restaurant signup controller", error.message);
     return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export const checkAuth = (req, res) => {
+  try{
+    res.status(200).json(req.user);
+  } catch(error){
+    console.log("Error in checkauth controller:",error.message);
+    return res.status(500).json({message:"Internal server error"});
   }
 }

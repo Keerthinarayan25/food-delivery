@@ -6,10 +6,15 @@ import dotenv from 'dotenv';
 import connectToDatabase from './database/mongodb.js';
 import cookieParser from 'cookie-parser';
 import { verifyToken } from './middleware/auth.middleware.js';
+import cors from 'cors';
 
 dotenv.config();
 
 const app = express();
+app.use(cors({
+  origin:'http://localhost:5173',
+  credentials: true,
+}))
 
 const PORT = process.env.PORT;
 

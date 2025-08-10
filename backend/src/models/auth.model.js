@@ -8,6 +8,13 @@ const userSchema = new mongoose.Schema({
     maxLength:15,
     required:true
   },
+  address:{
+    type:String,
+    trim:true,
+    minLength:4,
+    maxLength:15,
+    required:true
+  },
   email:{
     type:String,
     required:true,
