@@ -18,6 +18,7 @@ const menuItemSchema = new mongoose.Schema({
   },
   category:{
     type:String,
+    enum: ["Veg", "Non-Veg"],
     required:true
   },
   price:{
@@ -30,8 +31,8 @@ const menuItemSchema = new mongoose.Schema({
     default: true
   },
   image: {
-    type: String, // URL to the image
-    default: ''
+  data: Buffer,
+  contentType: String,
   },
   createdAt: {
     type: Date,

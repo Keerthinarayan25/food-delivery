@@ -1,125 +1,136 @@
 import MenuItem from "../models/menuItems.model.js";
 import Order from "../models/order.model.js";
 
-
-export const addDish = async (req,res) => {
-
+export const addDish = async (req, res) => {
   try {
-    const { name, description, category, price, image } = req.body;
+    const { name, description, category, price, isAvailable, restaurantId } = req.body;
+    console.log(restaurantId);
 
     if (!name || !description || !category || !price) {
       return res.status(400).json({ message: "Please provide all fields" });
     }
 
-    const addItem = new MenuItem({restaurantId:req.restaurant._id, name, description, category, price,image});
-    
-    await addItem.save();
-    res.status(201).json({success: true, data: addItem});
-    
+    const newDish = new MenuItem({
+      restaurantId,
+      name,
+      description,
+      category,
+      price,
+      isAvailable,
+      image: req.file
+        ? {
+            data: req.file.buffer,
+            contentType: req.file.mimetype,
+          }
+        : null,
+    });
+
+    await newDish.save();
+    res.status(201).json({ success: true, data: newDish });
   } catch (error) {
     console.error("Error in addDish:", error.message);
-    res.status(400).json({message:"Internal server error"});
+    res.status(400).json({ message: "Internal server error" });
   }
-  
 };
 
-export const displayMenu = async(req, res) =>{
-  
+export const displayMenu = async (req, res) => {
   try {
-    const items =  await MenuItem.findOne({restaurantId: req.restaurant._id});
-    if (!items) {
+    const { restaurantId } = req.query;
+    const items = await MenuItem.find({ restaurantId });
+    if (!items || items.length === 0) {
       return res.status(404).json({ message: "No menu items found " });
     }
-    res.status(200).json({count: items.length, data: items });
+    res.status(200).json({ count: items.length, data: items });
   } catch (error) {
     console.error("Error in displayMenu:", error.message);
-    res.status(500).json({message: "Internal server error" });
-    
+    res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const modifyItem = async (req, res) => {
-  
   try {
     const { id } = req.params;
     const updates = req.body;
 
-    const item = await MenuItem.findOneAndUpdate({_id: id, restaurantId: req.restaurant._id},updates, { new: true } );
+    const item = await MenuItem.findOneAndUpdate(
+      { _id: id, restaurantId: req.restaurant._id },
+      updates,
+      { new: true }
+    );
 
-    if (!item) return res.status(404).json({ message: 'Item not  found' });
-
-
+    if (!item) return res.status(404).json({ message: "Item not  found" });
 
     res.status(200).json({ success: true, data: item });
   } catch (error) {
-    console.log("Error in modifyItem", error.message)
-     res.status(400).json({message: "Internal server error" });
+    console.log("Error in modifyItem", error.message);
+    res.status(400).json({ message: "Internal server error" });
   }
-}
+};
 
-export const deleteItem = async(req, res) =>{
-
+export const deleteItem = async (req, res) => {
   try {
     const { id } = req.params;
     const deleteItem = await MenuItem.findOneAndDelete({
       _id: id,
       restaurantId: req.restaurant.id,
     });
-    if(!deleteItem) {
-      return res.status(404).json({message: "Item not found"});
+    if (!deleteItem) {
+      return res.status(404).json({ message: "Item not found" });
     }
-    res.status(202).json({message:"Menu item deleted"});
+    res.status(202).json({ message: "Menu item deleted" });
   } catch (error) {
-    res.status(500).json({message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
+export const getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ restaurantId: req.restaurant._id })
+      .populate("userId", "username")
+      .populate("items.menuItem", "name price");
 
-export const getAllOrders = async(req, res) => {
-
-  try{
-    const orders = await Order.find({restaurantId: req.restaurant._id}).populate('userId','username').populate('items.menuItem', 'name price');
-
-    if(!orders){
+    if (!orders) {
       return res.status(404).json({ message: "No orders found ." });
     }
-    res.status(200).json({count: orders.length, data: orders });
-
-  }catch(error){
+    res.status(200).json({ count: orders.length, data: orders });
+  } catch (error) {
     console.error("Error in getAllOrders:", error.message);
-    res.status(500).json({ message: "Internal server error " })
-
+    res.status(500).json({ message: "Internal server error " });
   }
+};
 
-}
-
-export const updateOrderStatus = async( req, res) => {
-
-  try{
+export const updateOrderStatus = async (req, res) => {
+  try {
     const { orderId } = req.params;
     const { status } = req.body;
 
-    if(!status){
-      return  res.status(400).json({ message: "Order status is not defined" });
+    if (!status) {
+      return res.status(400).json({ message: "Order status is not defined" });
     }
 
-    const validStatuses = ['placed', 'accepted', 'preparing', 'out for delivery', 'delivered', 'cancelled'];
+    const validStatuses = [
+      "placed",
+      "accepted",
+      "preparing",
+      "out for delivery",
+      "delivered",
+      "cancelled",
+    ];
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({ message: 'Invalid status' });
+      return res.status(400).json({ message: "Invalid status" });
     }
-    
+
     const order = await Order.findOneAndUpdate(
-      {_id: orderId, restaurantId: req.restaurant.id},
-      {status}, {new: true}
+      { _id: orderId, restaurantId: req.restaurant.id },
+      { status },
+      { new: true }
     );
 
-    if(!order){
-      return res.status(404).json({mesage:"Order not found"});
+    if (!order) {
+      return res.status(404).json({ mesage: "Order not found" });
     }
-  }catch(error){
+  } catch (error) {
     reconsole.error("Error in Updating order:", error.message);
-    res.status(500).json({ message: "Internal server error " })
-    
+    res.status(500).json({ message: "Internal server error " });
   }
-
-}
+};

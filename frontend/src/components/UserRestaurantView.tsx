@@ -1,31 +1,14 @@
-import { useState, useEffect } from "react";
-import api from "@/services/api";
+import { useEffect } from "react";
+import { UserFunctions } from "@/stores/UserFunctions";
 
-interface Restaurant {
-  _id?: string;
-  name: string;
-  address: string;
-  image: string;
-}
+
 
 export default function UserRestaurantView() {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [loading, setLoading] = useState(true); 
+  const { restaurants, isRestaurantLoading, fetchRestaurant } = UserFunctions();
   console.log(restaurants);
   useEffect(() => {
-    const fetchRestaurant = async () => {
-      try {
-        const res = await api.get("/user/restaurants");
-        setRestaurants(res.data.data || []);
-      } catch (error) {
-        console.error("Failed to fetch restaurants:", error);
-        setRestaurants([]);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchRestaurant();
-  }, []); // Empty dependency array, as this component only renders for users
+  }, [fetchRestaurant]);
 
   return (
     <div className="p-6">
@@ -34,19 +17,19 @@ export default function UserRestaurantView() {
         Explore local favorites and place your next order.
       </p>
 
-      {loading ? (
+      {isRestaurantLoading ? (
         <p className="mt-4">Loading Restaurants...</p>
       ) : (
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {restaurants.map((restaurant) => (
-            <div
+            <div 
               key={restaurant._id}
-              className="border rounded-lg p-4 bg-white text-black shadow hover:shadow-lg transition"
+              className="border rounded-lg p-4 bg-white text-black shadow hover:shadow-lg transition cursor-pointer"
             >
               <img
                 src={restaurant.image}
                 alt={restaurant.name}
-                className="w-full h-40 object-cover rounded-md mb-2"
+                className="w-full h-60 object-cover rounded-md mb-2"
               />
               <h2 className="text-lg font-bold">{restaurant.name}</h2>
               <p className="text-sm text-gray-600">{restaurant.address}</p>

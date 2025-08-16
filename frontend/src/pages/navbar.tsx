@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuthStore } from "@/stores/authStore";
 import { LogOut } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link} from "react-router-dom";
 import { Button } from "@/components/ui/button";
 const Navbar: React.FC = () => {
   const { AuthUser, logout } = useAuthStore();
@@ -42,13 +42,13 @@ const Navbar: React.FC = () => {
                 {AuthUser.role === "restaurant" && (
                   <>
                     <Link
-                      to="/restaurant/dashboard"
+                      to="/"
                       className="text-gray-600 hover:text-gray-900 transition"
                     >
                       Dashboard
                     </Link>
                     <Link
-                      to="/restaurant/menu"
+                      to="restaurant/menu"
                       className="text-gray-600 hover:text-gray-900 transition"
                     >
                       Menu
@@ -59,10 +59,12 @@ const Navbar: React.FC = () => {
                     >
                       Orders
                     </Link>
+
                   </>
                 )}
               </nav>
             )}
+            
           </div>
 
           {/* Right Section: Auth buttons */}
