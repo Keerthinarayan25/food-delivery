@@ -18,6 +18,7 @@ export const getAllRestaurants = async (req, res) => {
       address: restaurant.restaurantAddress,
       image: restaurant.image, 
     }));
+    console.log(formattedRestaurants[0]._id);
     res.status(200).json({
       success: true,
       message: "Restaurants fetched successfully",
@@ -32,6 +33,7 @@ export const getAllRestaurants = async (req, res) => {
 export const getMenu = async (req, res) => {
   try {
     const restaurantId = req.params.id;
+    console.log("Restaurant ID received from URL:", restaurantId);
     const restaurant = await Restaurants.findById(restaurantId);
     if (!restaurant) {
       return res.status(404).json({ message: "Restaurant not found" });
@@ -40,6 +42,7 @@ export const getMenu = async (req, res) => {
     if (!menuItems || menuItems.length === 0) {
       return res.status(404).json({ message: "No menu items found for this restaurant" });
     }
+    console.log(menuItems);
     res.status(200).json({
       success: true,
       message: "Menu items fetched successfully",

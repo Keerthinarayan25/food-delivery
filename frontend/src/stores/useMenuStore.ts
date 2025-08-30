@@ -14,6 +14,7 @@ interface MenuItem {
 interface MenuState {
   menuItems: MenuItem[];
   fetchMenu: (restaurantId: string) => Promise<void>;
+  fetchByRestaurant: (restaurantId: string) => Promise<void>;
 }
 
 export const useMenuStore = create<MenuState>((set) => ({
@@ -21,7 +22,7 @@ export const useMenuStore = create<MenuState>((set) => ({
 
   fetchMenu: async (restaurantId: string) => {
     try {
-      const res = await api.get(`/restaurant/menu?restaurantId=${restaurantId}`);
+      const res = await api.get("/restaurants/menu", { params: { restaurantId } });
       const data = res.data;
       if (data && data.data) {
         set({ menuItems: data.data });
@@ -30,4 +31,18 @@ export const useMenuStore = create<MenuState>((set) => ({
       console.error("Error in fetchMenu:", err);
     }
   },
+
+
+  fetchByRestaurant: async(restaurantId: string) =>{
+    try {
+      const res = await api.get(`/user/restaurants/${restaurantId}/menu`);
+      const data = res.data;
+      if (data && data.data) {
+        set({ menuItems: data.data });
+      }
+    } catch (err) {
+      console.error("Error in fetchMenu:", err);
+    }
+
+  }
 }));

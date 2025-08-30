@@ -31,7 +31,7 @@ const menuItemSchema = new mongoose.Schema({
     default: true
   },
   image: {
-  data: Buffer,
+  type: String,
   contentType: String,
   },
   createdAt: {

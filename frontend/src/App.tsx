@@ -7,6 +7,7 @@ import Login from './pages/login';
 import Signup from './pages/signup';
 import Homepage from './pages/HomePage';
 import MenuList from './components/MenuList';
+import RestaurantMenuPage from './pages/MenuPage';
 
 function App() {
   const { AuthUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -40,6 +41,8 @@ function App() {
               )
             }
           />
+
+          <Route path="/restaurants/:id/menu" element={<RestaurantMenuPage />}/>
         </Routes>
       </BrowserRouter>
     </div>

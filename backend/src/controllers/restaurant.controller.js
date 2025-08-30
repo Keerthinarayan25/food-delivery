@@ -3,11 +3,11 @@ import Order from "../models/order.model.js";
 
 export const addDish = async (req, res) => {
   try {
-    const { name, description, category, price, isAvailable, restaurantId } = req.body;
+    const { name, description, category, price, isAvailable, restaurantId, imageUrl } = req.body;
     console.log(restaurantId);
 
-    if (!name || !description || !category || !price) {
-      return res.status(400).json({ message: "Please provide all fields" });
+    if (!name || !description || !category || !price || !restaurantId || !imageUrl) {
+      return res.status(400).json({ message: "Please provide all required fields, including image URL." });
     }
 
     const newDish = new MenuItem({
@@ -17,19 +17,14 @@ export const addDish = async (req, res) => {
       category,
       price,
       isAvailable,
-      image: req.file
-        ? {
-            data: req.file.buffer,
-            contentType: req.file.mimetype,
-          }
-        : null,
+      image: imageUrl,
     });
 
     await newDish.save();
     res.status(201).json({ success: true, data: newDish });
   } catch (error) {
     console.error("Error in addDish:", error.message);
-    res.status(400).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 

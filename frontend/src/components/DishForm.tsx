@@ -2,22 +2,20 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "./ui/button";
 import api from "@/services/api";
 
-
 interface DishFormProps {
   restaurantId: string;
-
 }
 
 export default function DishForm({ restaurantId }: DishFormProps) {
-
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     category: "Veg",
     price: "",
+    imageUrl: "", // Changed from 'image' to 'imageUrl' to reflect its purpose
     isAvailable: true,
   });
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  // No need for imageFile state anymore
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -25,24 +23,22 @@ export default function DishForm({ restaurantId }: DishFormProps) {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
+    // Fix: Use '===' for comparison, not '=' for assignment
     if (type === "checkbox" || type === "radio") {
-    const target = e.target as HTMLInputElement; // safely cast
-    setFormData((prev) => ({
-      ...prev,
-      [name]: target.checked ? value || true : false,
-    }));
-  } else {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-  };
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImageFile(e.target.files[0]);
+      const target = e.target as HTMLInputElement; // safely cast
+      setFormData((prev) => ({
+        ...prev,
+        [name]: target.checked ? value || true : false,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
     }
   };
+
+  // No need for handleFileChange anymore
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -53,28 +49,29 @@ export default function DishForm({ restaurantId }: DishFormProps) {
       const payload = {
         ...formData,
         price: parseFloat(formData.price),
-        image: imageFile ?? undefined,
         restaurantId,
       };
-      await api.post("/restaurant/add-dish", payload,{
-        headers: { "Content-Type": "multipart/form-data" },
+
+      // Send as JSON
+      await api.post("/restaurant/add-dish", payload, {
+        headers: { "Content-Type": "application/json" },
       });
 
-      setMessage("Dis added successfully ....");
+      setMessage("Dish added successfully ....");
+      // Reset form fields
       setFormData({
         name: "",
         description: "",
         category: "Veg",
         price: "",
+        imageUrl: "", // Clear the imageUrl field
         isAvailable: true,
       });
-      setImageFile(null);
     } catch (error: unknown) {
       console.error("Error adding dish:", error);
       setMessage("Failed to add Dish . Try again");
     } finally {
       setLoading(false);
-
     }
   };
 
@@ -82,7 +79,6 @@ export default function DishForm({ restaurantId }: DishFormProps) {
     <div>
       <h2>Add New Dish</h2>
       {message && <p className="mb-3 text-center">{message}</p>}
-
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
@@ -100,7 +96,6 @@ export default function DishForm({ restaurantId }: DishFormProps) {
           onChange={handleChange}
           className="w-full border rounded-lg p-2"
         />
-
         <div>
           <label className="block font-semibold mb-1">Category</label>
           <div className="flex space-x-4">
@@ -126,7 +121,6 @@ export default function DishForm({ restaurantId }: DishFormProps) {
             </label>
           </div>
         </div>
-
         <input
           type="number"
           name="price"
@@ -137,10 +131,13 @@ export default function DishForm({ restaurantId }: DishFormProps) {
           required
           min="0"
         />
+        {/* Changed from file input to text input for URL */}
         <input
-          type="file"
-          accept="image/jpeg,image/jpg"
-          onChange={handleFileChange}
+          type="url" // Use type="url" for basic URL validation
+          name="imageUrl"
+          placeholder="Image URL (e.g., from Google Images)"
+          value={formData.imageUrl}
+          onChange={handleChange}
           className="w-full border rounded-lg p-2"
           required
         />
@@ -153,13 +150,10 @@ export default function DishForm({ restaurantId }: DishFormProps) {
           />
           <span>Available</span>
         </label>
-
-        <Button type="submit"
-          disabled={loading}>
+        <Button type="submit" disabled={loading}>
           {loading ? "Adding..." : "Add Dish"}
         </Button>
-
       </form>
     </div>
-  )
+  );
 }
