@@ -4,7 +4,6 @@ import { useAuthStore } from '@/stores/authStore';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
-
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const { login } = useAuthStore();

@@ -6,13 +6,14 @@ interface RestaurantMenuProps {
 }
 
 export default function RestaurantMenu({ restaurantId }: RestaurantMenuProps) {
-  const { menuItems, fetchByRestaurant } = useMenuStore();
+  const { menuItems, fetchMenuforUser, clearMenu } = useMenuStore();
 
   useEffect(() => {
     if (restaurantId) {
-      fetchByRestaurant(restaurantId);
+      clearMenu();
+      fetchMenuforUser(restaurantId);
     }
-  }, [restaurantId, fetchByRestaurant]);
+  }, [restaurantId, fetchMenuforUser, clearMenu]);
 
   return (
     <div className="p-4">
@@ -21,7 +22,7 @@ export default function RestaurantMenu({ restaurantId }: RestaurantMenuProps) {
       {menuItems.length === 0 ? (
         <p>No dishes found.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"> {/* Grid for card layout */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {menuItems.map((item) => (
             <div
               key={item._id}

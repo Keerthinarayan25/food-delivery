@@ -64,6 +64,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   signup: async (userData:SignupData) => {
     try {
+      console.log(userData);
       const res = await api.post("/auth/signup", userData);
       set({ isSignedUp: true, AuthUser: res.data, isLogedIn: true });
     } catch (error) {

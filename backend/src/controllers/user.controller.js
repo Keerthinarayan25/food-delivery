@@ -1,8 +1,7 @@
-import Restaurants from '../models/restaurant.model.js';
-import MenuItem from '../models/menuItems.model.js';
-import Cart from '../models/cart.model.js';
-import Order from '../models/order.model.js';
-
+import Restaurants from "../models/restaurant.model.js";
+import MenuItem from "../models/menuItems.model.js";
+import Cart from "../models/cart.model.js";
+import Order from "../models/order.model.js";
 
 export const getAllRestaurants = async (req, res) => {
   try {
@@ -12,11 +11,11 @@ export const getAllRestaurants = async (req, res) => {
         .status(404)
         .json({ success: false, message: "No restaurants found" });
     }
-    const formattedRestaurants = restaurants.map(restaurant => ({
-      _id: restaurant._id, 
+    const formattedRestaurants = restaurants.map((restaurant) => ({
+      _id: restaurant._id,
       name: restaurant.restaurantName,
       address: restaurant.restaurantAddress,
-      image: restaurant.image, 
+      image: restaurant.image,
     }));
     console.log(formattedRestaurants[0]._id);
     res.status(200).json({
@@ -25,8 +24,10 @@ export const getAllRestaurants = async (req, res) => {
       data: formattedRestaurants,
     });
   } catch (error) {
-    console.log('Error in getAllRestaurants:', error.message);
-    res.status(500).json({message: 'Server error: Unable to fetch restaurants' });
+    console.log("Error in getAllRestaurants:", error.message);
+    res
+      .status(500)
+      .json({ message: "Server error: Unable to fetch restaurants" });
   }
 };
 
@@ -34,27 +35,35 @@ export const getMenu = async (req, res) => {
   try {
     const restaurantId = req.params.id;
     console.log("Restaurant ID received from URL:", restaurantId);
+    
     const restaurant = await Restaurants.findById(restaurantId);
+
     if (!restaurant) {
       return res.status(404).json({ message: "Restaurant not found" });
     }
-    const menuItems = await MenuItem.find({ restaurantId: restaurant._id });
-    if (!menuItems || menuItems.length === 0) {
-      return res.status(404).json({ message: "No menu items found for this restaurant" });
+
+    const menuItems = await MenuItem.find({ restaurantId: restaurantId });
+
+    if (!menuItems.length) {
+      return res
+        .status(404)
+        .json({ message: "No menu items found for this restaurant" });
     }
-    console.log(menuItems);
+
+    console.log(restaurant.menuItems);
+
     res.status(200).json({
       success: true,
       message: "Menu items fetched successfully",
+      restaurantName: restaurant.restaurantName,
       data: menuItems,
     });
+    
   } catch (error) {
     console.error("Error in getMenu:", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
-
-}
-
+};
 
 export const addToCart = async (req, res) => {
   try {
@@ -62,7 +71,9 @@ export const addToCart = async (req, res) => {
     const { menuItemId, quantity } = req.body;
 
     if (!menuItemId || !quantity || quantity < 1) {
-      return res.status(400).json({ message: "Menu item and positive quantity required" });
+      return res
+        .status(400)
+        .json({ message: "Menu item and positive quantity required" });
     }
 
     let cart = await Cart.findOne({ user: userId });
@@ -70,8 +81,9 @@ export const addToCart = async (req, res) => {
       cart = new Cart({ user: userId, items: [] });
     }
 
-
-    const existingItem = cart.items.find(item => item.menuItem.toString() === menuItemId);
+    const existingItem = cart.items.find(
+      (item) => item.menuItem.toString() === menuItemId
+    );
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
@@ -86,8 +98,6 @@ export const addToCart = async (req, res) => {
   }
 };
 
-
-
 export const getUserOrders = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -98,8 +108,6 @@ export const getUserOrders = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
 
 export const getUserOrderById = async (req, res) => {
   try {
@@ -116,13 +124,10 @@ export const getUserOrderById = async (req, res) => {
   }
 };
 
-
-
 export const cancelUserOrder = async (req, res) => {
   try {
     const userId = req.user._id;
     const { id } = req.params;
-
 
     const order = await Order.findOne({ _id: id, user: userId });
     if (!order) {

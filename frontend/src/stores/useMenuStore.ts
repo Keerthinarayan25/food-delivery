@@ -8,13 +8,14 @@ interface MenuItem {
   category: "Veg" | "non-Veg";
   price: number;
   isAvailable: boolean;
-  image?: File | null;
+  image?: string | null;
 }
 
 interface MenuState {
   menuItems: MenuItem[];
   fetchMenu: (restaurantId: string) => Promise<void>;
-  fetchByRestaurant: (restaurantId: string) => Promise<void>;
+  fetchMenuforUser: (restaurantId: string) => Promise<void>;
+  clearMenu:()=>void;
 }
 
 export const useMenuStore = create<MenuState>((set) => ({
@@ -33,10 +34,11 @@ export const useMenuStore = create<MenuState>((set) => ({
   },
 
 
-  fetchByRestaurant: async(restaurantId: string) =>{
+  fetchMenuforUser: async(restaurantId: string) =>{
     try {
       const res = await api.get(`/user/restaurants/${restaurantId}/menu`);
       const data = res.data;
+      console.log("useMenu store fetchBy restaurant:", data);
       if (data && data.data) {
         set({ menuItems: data.data });
       }
@@ -44,5 +46,7 @@ export const useMenuStore = create<MenuState>((set) => ({
       console.error("Error in fetchMenu:", err);
     }
 
-  }
+  },
+
+  clearMenu:() => set({menuItems:[]})
 }));

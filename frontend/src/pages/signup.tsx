@@ -11,7 +11,7 @@ const Signup = () => {
   const [role, setRole] = useState<"user" |"restaurant">("user");
 
   const [formData, setFormData] = useState({
-    name:"",
+    userName:"",
     address:"",
     email: '',
     password: '',
@@ -61,8 +61,8 @@ const Signup = () => {
             <input 
               type="text" 
               placeholder='Restaurant Name'
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name:e.target.value})} 
+              value={formData.userName}
+              onChange={(e) => setFormData({...formData, userName:e.target.value})} 
               className="w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
               />
 
@@ -79,8 +79,8 @@ const Signup = () => {
             <input
               type="text"
               placeholder="Full Name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              value={formData.userName}
+              onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
               className="w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
             />
           )}

@@ -6,7 +6,7 @@ export const verifyToken = async (req, res, next) => {
   try {
     const token = req.cookies.jwt;
 
-    console.log("Token from cookie:", token);
+    // console.log("Token from cookie:", token);
 
     if (!token) {
       return res.status(401).json({ message: "Unauthorized no token found" });
@@ -19,7 +19,8 @@ export const verifyToken = async (req, res, next) => {
         .status(401)
         .json({ message: "Unauthorized token not verified" });
     }
-    console.log("Decoded token:", decoded);
+    //console.log("Decoded token:", decoded);
+
     let account;
     if (decoded.role === "user") {
       account = await User.findById(decoded.userId).select("-password");
@@ -31,7 +32,6 @@ export const verifyToken = async (req, res, next) => {
       return res.status(404).json({ message: "Account not found" });
     }
 
-    // 4️⃣ Attach to req as "user" for both roles
     req.user = account;
     req.userRole = decoded.role;
     next();
