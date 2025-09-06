@@ -7,7 +7,7 @@ export const signUp = async (req, res) => {
   const { userName, address, email, password, role } = req.body;
 
   try {
-    if (!email || !address|| !password || !userName) {
+    if (!email || !address || !password || !userName) {
       return res.status(400).json({ message: "All fileds are required" });
     }
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DishForm from "./DishForm";
+import DishForm from "./Restaurant comp/DishForm";
 import RestaurantMenu from "./RestaurantMenu";
 import { Button } from "./ui/button";
 export default function MenuList({ restaurantId }: { restaurantId: string }) {

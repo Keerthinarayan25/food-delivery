@@ -146,3 +146,50 @@ export const cancelUserOrder = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+export const CreateOrder = async(req, res) => {
+
+  try{
+    const { restaurantId, menuItemId, quantity, deliveryAddress } = req.body;
+
+    const userId = req.user._id;
+
+    const restaurant = await Restaurants.findById(restaurantId);
+    if (!restaurant) return res.status(404).json({ message: "Restaurant not found" });
+
+    const menuItem = await MenuItem.findById(menuItemId);
+    if (!menuItem) {
+      return res.status(404).json({ message: "Menu item not found" });
+    }
+
+    // Calculate price
+    const totalPrice = menuItem.price * quantity;
+
+    // Create order
+    const newOrder = new Order({
+      user: userId,
+      restaurant: restaurantId,
+      items: [
+        {
+          menuItem: menuItemId,
+          quantity,
+        },
+      ],
+      totalPrice,
+      deliveryAddress,
+    });
+
+    await newOrder.save();
+
+    return res.status(201).json({
+      message: "Order placed successfully",
+      order: newOrder,
+    });
+
+  }catch(error){
+    console.error("Error creating order:", error);
+    res.status(500).json({ message: "Server error" });
+
+  }
+}

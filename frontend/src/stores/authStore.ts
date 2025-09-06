@@ -28,6 +28,7 @@ interface SignupData {
   userName:string;
   address:string;
   email:string;
+  password:string;
   role:UserRole;
 }
 
@@ -65,7 +66,26 @@ export const useAuthStore = create<AuthState>((set) => ({
   signup: async (userData:SignupData) => {
     try {
       console.log(userData);
-      const res = await api.post("/auth/signup", userData);
+      let res;
+      
+      if(userData.role === "restaurant"){
+        res = await api.post("/auth/restaurant/signup",{
+          restaurantName:userData.userName,
+          restaurantAddress:userData.address,
+          email:userData.email,
+          password:userData.password,
+          role:userData.role,
+        });
+      } else{
+        res = await api.post("/auth/signup",{
+          userName: userData.userName,
+          address:userData.address,
+          email:userData.email,
+          password:userData.password,
+          role:userData.role,
+        });
+
+      }
       set({ isSignedUp: true, AuthUser: res.data, isLogedIn: true });
     } catch (error) {
       console.error("Signup failed:", error);

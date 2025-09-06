@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import api from "@/services/api";
 
 interface DishFormProps {

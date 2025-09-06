@@ -37,13 +37,18 @@ export const useMenuStore = create<MenuState>((set) => ({
   fetchMenuforUser: async(restaurantId: string) =>{
     try {
       const res = await api.get(`/user/restaurants/${restaurantId}/menu`);
-      const data = res.data;
-      console.log("useMenu store fetchBy restaurant:", data);
-      if (data && data.data) {
-        set({ menuItems: data.data });
-      }
+
+      console.log("useMenu store fetchBy restaurant:", res.data);
+      set({
+      menuItems: res.data.data.map((item: MenuItem) => ({
+        ...item,
+        restaurantId,
+      })),
+      
+    });
     } catch (err) {
       console.error("Error in fetchMenu:", err);
+      set({ menuItems: [] });
     }
 
   },

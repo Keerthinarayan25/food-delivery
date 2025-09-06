@@ -1,4 +1,4 @@
-import RestaurantDashboard from "@/components/RestauratDashboard";
+import RestaurantDashboard from "@/components/Restaurant comp/RestauratDashboard";
 import UserRestaurantView from "@/components/UserRestaurantView";
 import { useAuthStore } from "@/stores/authStore";
 import { useEffect } from "react";

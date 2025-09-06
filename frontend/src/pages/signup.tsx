@@ -8,11 +8,11 @@ import { UtensilsCrossed } from 'lucide-react';
 
 
 const Signup = () => {
-  const [role, setRole] = useState<"user" |"restaurant">("user");
+  const [role, setRole] = useState<"user" | "restaurant">("user");
 
   const [formData, setFormData] = useState({
-    userName:"",
-    address:"",
+    userName: "",
+    address: "",
     email: '',
     password: '',
     role: 'user' as UserRole
@@ -22,6 +22,7 @@ const Signup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log(formData);
     await signup(formData);
   };
 
@@ -36,21 +37,25 @@ const Signup = () => {
         </p>
         {/* Role  */}
         <div className="flex mb-6 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-          <Button className={`flex-1 flex items-center justify-center gap-2 py-2 ${
-              role === "user"
-              ? buttonVariants({ variant: "default" })
-              : buttonVariants({ variant: "secondary" })
+          <Button className={`flex-1 flex items-center justify-center gap-2 py-2 ${role === "user"
+            ? buttonVariants({ variant: "default" })
+            : buttonVariants({ variant: "secondary" })
             }`}
-            onClick={() => setRole("user")}>
-              <User/>Customer
+            onClick={() => {
+              setRole("user");
+              setFormData({ ...formData, role: "user" });
+            }}>
+            <User />Customer
           </Button>
-          <Button className={`flex-1 flex items-center justify-center gap-2 py-2 ${
-              role === "restaurant"
-                ?  buttonVariants({ variant: "default" })
-                : buttonVariants({ variant: "secondary" })
+          <Button className={`flex-1 flex items-center justify-center gap-2 py-2 ${role === "restaurant"
+            ? buttonVariants({ variant: "default" })
+            : buttonVariants({ variant: "secondary" })
             }`}
-            onClick={() => setRole("restaurant")}>
-              <UtensilsCrossed/> Restaurant 
+            onClick={() => {
+              setRole("restaurant");
+              setFormData({ ...formData, role: "restaurant" });
+            }}>
+            <UtensilsCrossed /> Restaurant
           </Button>
         </div>
 
@@ -58,20 +63,20 @@ const Signup = () => {
         <form onSubmit={handleSubmit} className='space-y-4'>
           {role === "restaurant" && (
             <>
-            <input 
-              type="text" 
-              placeholder='Restaurant Name'
-              value={formData.userName}
-              onChange={(e) => setFormData({...formData, userName:e.target.value})} 
-              className="w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
+              <input
+                type="text"
+                placeholder='Restaurant Name'
+                value={formData.userName}
+                onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
+                className="w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
               />
 
-              <input 
-              type="text" 
-              placeholder='Business Address'
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
+              <input
+                type="text"
+                placeholder='Business Address'
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                className="w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
               />
             </>
           )}
@@ -90,6 +95,13 @@ const Signup = () => {
             placeholder="Email Address"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            className="w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
+          />
+          <input
+            type="text"
+            placeholder='Address'
+            value={formData.address}
+            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
             className="w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
           />
           <input
