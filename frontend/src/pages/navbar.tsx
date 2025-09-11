@@ -54,7 +54,7 @@ const Navbar: React.FC = () => {
                       Menu
                     </Link>
                     <Link
-                      to="/restaurant/orders"
+                      to={`/restaurant/${AuthUser._id}/orders`}
                       className="text-gray-600 hover:text-gray-900 transition"
                     >
                       Orders

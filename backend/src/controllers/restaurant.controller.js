@@ -80,14 +80,21 @@ export const deleteItem = async (req, res) => {
 
 export const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ restaurantId: req.restaurant._id })
-      .populate("userId", "username")
+     const restaurantId = req.params.id;
+    const orders = await Order.find({ restaurant: restaurantId })
+      .populate("user", "name email")
       .populate("items.menuItem", "name price");
 
-    if (!orders) {
+    console.log("Orders are:", orders);
+
+    if (!orders || orders.length === 0) {
       return res.status(404).json({ message: "No orders found ." });
     }
-    res.status(200).json({ count: orders.length, data: orders });
+    res.status(200).json({
+      success: true,
+      count: orders.length,
+      data: orders,
+    });
   } catch (error) {
     console.error("Error in getAllOrders:", error.message);
     res.status(500).json({ message: "Internal server error " });

@@ -9,7 +9,7 @@ const upload = multer({ storage });
 restaurantRouter.get("/profile", authorizeRole("user","restaurant","admin"));
 
 restaurantRouter.get("/menu", authorizeRole("user","restaurant"), displayMenu); //done
-restaurantRouter.get("/orders", authorizeRole("admin","restaurant"),getAllOrders);
+restaurantRouter.get("/:id/orders", authorizeRole("admin","restaurant"),getAllOrders);
 
 restaurantRouter.post("/profile", authorizeRole("restaurant"));
 restaurantRouter.post("/add-dish", authorizeRole("restaurant"),upload.single("image") ,addDish); //done
