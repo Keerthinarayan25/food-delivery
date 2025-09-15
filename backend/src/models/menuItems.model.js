@@ -34,10 +34,6 @@ const menuItemSchema = new mongoose.Schema({
   type: String,
   contentType: String,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
 },{timestamps:true});
 
 const MenuItem = mongoose.model('MenuItem', menuItemSchema);

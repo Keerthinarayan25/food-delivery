@@ -21,7 +21,7 @@ const orderSchema = new mongoose.Schema({
   },
   restaurant:{
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Restaurant",
+    ref: "Restaurants",
     required: true
   },
   items:[orderItemSchema],
