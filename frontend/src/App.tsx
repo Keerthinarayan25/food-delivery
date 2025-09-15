@@ -9,6 +9,7 @@ import Homepage from './pages/HomePage';
 import MenuList from './components/MenuList';
 import RestaurantMenuPage from './pages/MenuPage';
 import RestaurantOrdersPage from './pages/RestaurantOrderPage';
+import CartPage from './pages/CartPage';
 
 function App() {
   const { AuthUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -46,6 +47,8 @@ function App() {
           <Route path="/restaurants/:id/menu" element={<RestaurantMenuPage />}/>
 
           <Route path="/restaurant/:restaurantId/orders" element={<RestaurantOrdersPage />} />
+
+          <Route path="/user/cart" element={<CartPage />} />
 
         </Routes>
       </BrowserRouter>

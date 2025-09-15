@@ -36,6 +36,12 @@ const Navbar: React.FC = () => {
                     >
                       Profile
                     </Link>
+                    <Link
+                      to="/user/cart"
+                      className="text-gray-600 hover:text-gray-900 transition"
+                    >
+                      Cart
+                    </Link>
                   </>
                 )}
 
