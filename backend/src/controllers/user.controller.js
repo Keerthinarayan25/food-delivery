@@ -35,7 +35,7 @@ export const getMenu = async (req, res) => {
   try {
     const restaurantId = req.params.id;
     console.log("Restaurant ID received from URL:", restaurantId);
-    
+
     const restaurant = await Restaurants.findById(restaurantId);
 
     if (!restaurant) {
@@ -58,7 +58,6 @@ export const getMenu = async (req, res) => {
       restaurantName: restaurant.restaurantName,
       data: menuItems,
     });
-    
   } catch (error) {
     console.error("Error in getMenu:", error.message);
     res.status(500).json({ message: "Internal server error" });
@@ -78,20 +77,25 @@ export const addToCart = async (req, res) => {
 
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
-      cart = new Cart({ user: userId, items: [] });
-    }
-
-    const existingItem = cart.items.find(
-      (item) => item.menuItem.toString() === menuItemId
-    );
-    if (existingItem) {
-      existingItem.quantity += quantity;
+      cart = new Cart({
+        user: userId,
+        items: [{ menuItem: menuItemId, quantity }],
+      });
     } else {
-      cart.items.push({ menuItem: menuItemId, quantity });
+      const existingItem = cart.items.find(
+        (item) => item.menuItem.toString() === menuItemId
+      );
+
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.items.push({ menuItem: menuItemId, quantity });
+      }
     }
     await cart.save();
+    console.log("IN add to cart backend:", existingItem);
 
-    res.status(200).json({ success: true, cart });
+    res.status(201).json({ success: true, cart });
   } catch (error) {
     console.error("Error in addToCart:", error.message);
     res.status(500).json({ message: "Internal server error" });
@@ -147,16 +151,15 @@ export const cancelUserOrder = async (req, res) => {
   }
 };
 
-
-export const CreateOrder = async(req, res) => {
-
-  try{
+export const CreateOrder = async (req, res) => {
+  try {
     const { restaurantId, menuItemId, quantity, deliveryAddress } = req.body;
 
     const userId = req.user._id;
 
     const restaurant = await Restaurants.findById(restaurantId);
-    if (!restaurant) return res.status(404).json({ message: "Restaurant not found" });
+    if (!restaurant)
+      return res.status(404).json({ message: "Restaurant not found" });
 
     const menuItem = await MenuItem.findById(menuItemId);
     if (!menuItem) {
@@ -186,10 +189,46 @@ export const CreateOrder = async(req, res) => {
       message: "Order placed successfully",
       order: newOrder,
     });
-
-  }catch(error){
+  } catch (error) {
     console.error("Error creating order:", error);
     res.status(500).json({ message: "Server error" });
-
   }
-}
+};
+
+export const getCart = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const CartItems = await Cart.findOne({ user: userId }).populate({
+      path: "items.menuItem",
+      populate: {
+        path: "restaurantId",
+        select: "restaurantName restaurantAddress image",
+      },
+    });
+
+    console.log("IN get cart function:", CartItems);
+
+    if (!CartItems) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    const items  = CartItems.items.map((item) => ({
+      _id: item._id,
+      quantity: item.quantity,
+      menuItem: {
+        _id: item.menuItem._id,
+        name: item.menuItem.name,
+        description: item.menuItem.description,
+        category: item.menuItem.category,
+        price: item.menuItem.price,
+        image: item.menuItem.image,
+        restaurant: item.menuItem.restaurantId,
+      }
+    }));
+    res.status(200).json({ success: true, items  });
+  } catch (error) {
+    console.error("Error fetching cart:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

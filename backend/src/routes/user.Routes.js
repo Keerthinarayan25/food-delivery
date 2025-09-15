@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { authorizeRole } from "../middleware/role.middleware.js";
-import { addToCart, cancelUserOrder, CreateOrder, getAllRestaurants, getMenu, getUserOrderById, getUserOrders } from "../controllers/user.controller.js";
-import { get } from "mongoose";
+import { addToCart, cancelUserOrder, CreateOrder, getAllRestaurants, getMenu, getUserOrderById, getUserOrders, getCart } from "../controllers/user.controller.js";
 
 const userRouter =  Router();
 
@@ -18,6 +17,8 @@ userRouter.get("/orders", authorizeRole("user"),getUserOrders);
 userRouter.post("/sendOrders", authorizeRole("user"), CreateOrder);
 userRouter.get("/orders/:id", authorizeRole("user"), getUserOrderById);
 userRouter.patch("/orders/:id/cancel", authorizeRole("user"),cancelUserOrder);
+userRouter.get("/cart",authorizeRole("user"),getCart);
+userRouter.post("/cart",authorizeRole("user"),addToCart);
 
 
 export default userRouter;
